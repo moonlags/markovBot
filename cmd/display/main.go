@@ -27,4 +27,5 @@ func main() {
 	for key, value := range data.Chain {
 		fmt.Printf("%s: %v\n", key, value)
 	}
+	fmt.Printf("images: %v\n", data.Images)
 }
