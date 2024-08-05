@@ -48,6 +48,10 @@ func (s *server) run() error {
 		if update.FromChat().IsGroup() {
 			chain.Add(strings.NewReader(update.Message.Text))
 			chain.Add(strings.NewReader(update.Message.Caption))
+
+			if len(update.Message.Photo) > 0 {
+				s.images = append(s.images, update.Message.Photo[0].FileID)
+			}
 		}
 
 		if rand.Intn(101) > s.config.chance {
