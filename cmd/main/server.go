@@ -31,6 +31,9 @@ func (s *server) run() error {
 	for update := range updates {
 		if len(saveTicker.C) > 0 {
 			slog.Info("saving data")
+
+			<-saveTicker.C
+
 			if err := s.saveGobData(chain); err != nil {
 				s.logger.Error(err.Error())
 				os.Exit(1)
