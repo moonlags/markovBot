@@ -27,47 +27,46 @@ func (s *server) run() error {
 	saveTicker := time.NewTicker(time.Minute * 5)
 	defer saveTicker.Stop()
 
-	updates := s.bot.GetUpdatesChan(tgbotapi.NewUpdate(1))
+	updates := s.bot.GetUpdatesChan(tgbotapi.NewUpdate(0))
 	for update := range updates {
-		select {
-		case <-saveTicker.C:
+		if len(saveTicker.C) > 0 {
 			slog.Info("saving data")
 			if err := s.saveGobData(chain); err != nil {
 				s.logger.Error(err.Error())
 				os.Exit(1)
 			}
-		default:
-			if update.Message == nil {
-				continue
+		}
+
+		if update.Message == nil {
+			continue
+		}
+		slog.Info("new message", "text", update.Message.Text, "user", update.Message.From.UserName)
+
+		if update.FromChat().IsGroup() {
+			chain.Add(strings.NewReader(update.Message.Text))
+			chain.Add(strings.NewReader(update.Message.Caption))
+		}
+
+		if rand.Intn(101) > s.config.chance {
+			continue
+		}
+
+		text := chain.Generate(rand.Intn(5) + 3)
+		s.logger.Info("response", "text", text, "user", update.Message.From.UserName)
+
+		if rand.Intn(101) < s.config.imageChance && len(s.images) > 0 {
+			imageID := s.images[rand.Intn(len(s.images))]
+
+			msg := tgbotapi.NewPhoto(update.FromChat().ID, tgbotapi.FileID(imageID))
+			msg.Caption = text
+
+			if _, err := s.bot.Send(msg); err != nil {
+				return err
 			}
-			slog.Info("new message", "text", update.Message.Text, "user", update.Message.From.UserName)
-
-			if update.FromChat().IsGroup() {
-				chain.Add(strings.NewReader(update.Message.Text))
-				chain.Add(strings.NewReader(update.Message.Caption))
-			}
-
-			if rand.Intn(101) > s.config.chance {
-				continue
-			}
-
-			text := chain.Generate(rand.Intn(5) + 3)
-			s.logger.Info("response", "text", text, "user", update.Message.From.UserName)
-
-			if rand.Intn(101) < s.config.imageChance && len(s.images) > 0 {
-				imageID := s.images[rand.Intn(len(s.images))]
-
-				msg := tgbotapi.NewPhoto(update.FromChat().ID, tgbotapi.FileID(imageID))
-				msg.Caption = text
-
-				if _, err := s.bot.Send(msg); err != nil {
-					return err
-				}
-			} else {
-				msg := tgbotapi.NewMessage(update.FromChat().ID, text)
-				if _, err := s.bot.Send(msg); err != nil {
-					return err
-				}
+		} else {
+			msg := tgbotapi.NewMessage(update.FromChat().ID, text)
+			if _, err := s.bot.Send(msg); err != nil {
+				return err
 			}
 		}
 	}
