@@ -7,6 +7,8 @@ import (
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/joho/godotenv"
+	"github.com/lmittmann/tint"
+	"github.com/moonlags/markovBot/internal/markov"
 )
 
 type config struct {
@@ -16,10 +18,10 @@ type config struct {
 }
 
 func main() {
-	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
+	logger := slog.New(tint.NewHandler(os.Stdout, nil))
 
 	if err := godotenv.Load(); err != nil {
-		logger.Error(err.Error())
+		logger.Error("Can not load env variables", "err", err)
 		os.Exit(1)
 	}
 
@@ -33,18 +35,19 @@ func main() {
 
 	bot, err := tgbotapi.NewBotAPI(os.Getenv("TOKEN"))
 	if err != nil {
-		logger.Error(err.Error())
+		logger.Error("Can not create bot api", "err", err)
 		os.Exit(1)
 	}
 
 	server := server{
+		chain:  markov.NewChain(cfg.prefixLen),
 		logger: logger,
 		config: cfg,
 		bot:    bot,
 	}
 
 	if err := server.run(); err != nil {
-		logger.Error(err.Error())
+		logger.Error("Can not run the server", "err", err)
 		os.Exit(1)
 	}
 }

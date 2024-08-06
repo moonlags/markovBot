@@ -4,7 +4,6 @@ import (
 	"log/slog"
 	"math/rand"
 	"os"
-	"strings"
 	"time"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
@@ -12,6 +11,7 @@ import (
 )
 
 type server struct {
+	chain  *markov.Chain
 	bot    *tgbotapi.BotAPI
 	logger *slog.Logger
 	images []string
@@ -19,23 +19,19 @@ type server struct {
 }
 
 func (s *server) run() error {
-	chain := markov.NewChain(s.config.prefixLen)
-	if err := s.loadGobData(chain); err != nil {
-		s.logger.Error(err.Error())
+	if err := s.loadGobData(); err != nil {
+		s.logger.Error("Can not load gob data", "err", err)
 	}
 
-	saveTicker := time.NewTicker(time.Minute * 5)
-	defer saveTicker.Stop()
+	saveTicker := time.Tick(time.Minute * 5)
 
 	updates := s.bot.GetUpdatesChan(tgbotapi.NewUpdate(0))
 	for update := range updates {
-		if len(saveTicker.C) > 0 {
-			slog.Info("saving data")
+		if len(saveTicker) > 0 {
+			<-saveTicker
 
-			<-saveTicker.C
-
-			if err := s.saveGobData(chain); err != nil {
-				s.logger.Error(err.Error())
+			if err := s.saveGobData(); err != nil {
+				s.logger.Error("Can not save gob data", "err", err)
 				os.Exit(1)
 			}
 		}
@@ -43,23 +39,18 @@ func (s *server) run() error {
 		if update.Message == nil {
 			continue
 		}
-		slog.Info("new message", "text", update.Message.Text, "user", update.Message.From.UserName)
 
-		if update.FromChat().IsGroup() {
-			chain.Add(strings.NewReader(update.Message.Text))
-			chain.Add(strings.NewReader(update.Message.Caption))
-
-			if len(update.Message.Photo) > 0 {
-				s.images = append(s.images, update.Message.Photo[0].FileID)
-			}
+		if len(update.Message.Photo) > 0 {
+			s.handlePhoto(update)
 		}
+		s.handleText(update)
 
 		if rand.Intn(101) > s.config.chance {
 			continue
 		}
 
-		text := chain.Generate(rand.Intn(5) + 3)
-		s.logger.Info("response", "text", text, "user", update.Message.From.UserName)
+		text := s.chain.Generate(rand.Intn(5) + 3)
+		s.logger.Info("response", "text", text)
 
 		if rand.Intn(101) < s.config.imageChance && len(s.images) > 0 {
 			imageID := s.images[rand.Intn(len(s.images))]

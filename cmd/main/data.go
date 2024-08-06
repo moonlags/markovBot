@@ -3,8 +3,6 @@ package main
 import (
 	"encoding/gob"
 	"os"
-
-	"github.com/moonlags/markovBot/internal/markov"
 )
 
 type gobData struct {
@@ -12,7 +10,7 @@ type gobData struct {
 	Images []string
 }
 
-func (s *server) loadGobData(chain *markov.Chain) error {
+func (s *server) loadGobData() error {
 	file, err := os.Open("data.gob")
 	if err != nil {
 		return err
@@ -25,12 +23,12 @@ func (s *server) loadGobData(chain *markov.Chain) error {
 	}
 
 	s.images = data.Images
-	chain.Chain = data.Chain
+	s.chain.Chain = data.Chain
 
 	return nil
 }
 
-func (s *server) saveGobData(chain *markov.Chain) error {
+func (s *server) saveGobData() error {
 	file, err := os.Create("data.gob")
 	if err != nil {
 		return err
@@ -38,7 +36,7 @@ func (s *server) saveGobData(chain *markov.Chain) error {
 	defer file.Close()
 
 	data := gobData{
-		Chain:  chain.Chain,
+		Chain:  s.chain.Chain,
 		Images: s.images,
 	}
 
