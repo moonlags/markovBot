@@ -20,7 +20,7 @@ type server struct {
 
 func (s *server) run() error {
 	if err := s.loadGobData(); err != nil {
-		slog.Error("Can not load gob data", "err", err)
+		slog.Warn("Can not load gob data", "err", err)
 	}
 
 	saveTicker := time.Tick(time.Minute * 5)
