@@ -19,7 +19,7 @@ func (s *server) handlePhoto(update tgbotapi.Update) {
 }
 
 func (s *server) handleText(update tgbotapi.Update) {
-	slog.Info("message", "text", update.Message.Caption, "firstname", update.Message.From.FirstName)
+	slog.Info("message", "text", update.Message.Text, "firstname", update.Message.From.FirstName)
 
 	if !update.Message.Chat.IsGroup() {
 		return
