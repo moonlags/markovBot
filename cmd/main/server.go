@@ -7,20 +7,20 @@ import (
 	"time"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+
 	"github.com/moonlags/markovBot/internal/markov"
 )
 
 type server struct {
 	chain  *markov.Chain
 	bot    *tgbotapi.BotAPI
-	logger *slog.Logger
 	images []string
 	config config
 }
 
 func (s *server) run() error {
 	if err := s.loadGobData(); err != nil {
-		s.logger.Error("Can not load gob data", "err", err)
+		slog.Error("Can not load gob data", "err", err)
 	}
 
 	saveTicker := time.Tick(time.Minute * 5)
@@ -31,7 +31,7 @@ func (s *server) run() error {
 			<-saveTicker
 
 			if err := s.saveGobData(); err != nil {
-				s.logger.Error("Can not save gob data", "err", err)
+				slog.Error("Can not save gob data", "err", err)
 				os.Exit(1)
 			}
 		}
@@ -50,7 +50,7 @@ func (s *server) run() error {
 		}
 
 		text := s.chain.Generate(rand.Intn(5) + 3)
-		s.logger.Info("response", "text", text)
+		slog.Info("response", "text", text)
 
 		if rand.Intn(101) < s.config.imageChance && len(s.images) > 0 {
 			imageID := s.images[rand.Intn(len(s.images))]
