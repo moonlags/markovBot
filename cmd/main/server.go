@@ -49,7 +49,7 @@ func (s *server) run() error {
 			continue
 		}
 
-		text := s.chain.Generate(rand.Intn(5) + 3)
+		text := s.chain.Generate(rand.Intn(8) + 3)
 		slog.Info("response", "text", text)
 
 		if rand.Intn(101) < s.config.imageChance && len(s.images) > 0 {
