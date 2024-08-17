@@ -7,11 +7,6 @@ import (
 	"os"
 )
 
-type data struct {
-	Chain  map[string][]string
-	Images []string
-}
-
 func main() {
 	file, err := os.Open("data.gob")
 	if err != nil {
@@ -19,13 +14,12 @@ func main() {
 	}
 	defer file.Close()
 
-	data := new(data)
-	if err := gob.NewDecoder(file).Decode(data); err != nil {
+	var data map[string][]string
+	if err := gob.NewDecoder(file).Decode(&data); err != nil {
 		log.Fatal("Failed to decode gob:", err)
 	}
 
-	for key, value := range data.Chain {
+	for key, value := range data {
 		fmt.Printf("%s: %v\n", key, value)
 	}
-	fmt.Printf("images: %v\n", data.Images)
 }
