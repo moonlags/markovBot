@@ -48,12 +48,20 @@ func GetMemes() ([]Meme, error) {
 }
 
 func (c *Config) MemeWithCaption(id, text0, text1 string) (string, error) {
-	data, err := c.captionBody(id, text0, text1)
+	req, err := http.NewRequest("POST", "https://api.imgflip.com/caption_image", nil)
 	if err != nil {
 		return "", err
 	}
 
-	resp, err := http.Post("https://api.imgflip.com/caption_image", "application/json", data)
+	q := req.URL.Query()
+	q.Add("template_id", id)
+	q.Add("username", c.Username)
+	q.Add("password", c.Password)
+	q.Add("text0", text0)
+	q.Add("text1", text1)
+	req.URL.RawQuery = q.Encode()
+
+	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return "", err
 	}
