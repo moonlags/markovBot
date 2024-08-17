@@ -9,13 +9,14 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/lmittmann/tint"
 
+	"github.com/moonlags/markovBot/internal/imgflip"
 	"github.com/moonlags/markovBot/internal/markov"
 )
 
 type config struct {
-	prefixLen   int
-	chance      int
-	imageChance int
+	prefixLen  int
+	chance     int
+	memeChance int
 }
 
 func init() {
@@ -30,9 +31,9 @@ func init() {
 func main() {
 	var cfg config
 
-	flag.IntVar(&cfg.prefixLen, "prefix", 1, "prefix length in words")
+	flag.IntVar(&cfg.prefixLen, "prefix", 2, "prefix length in words")
 	flag.IntVar(&cfg.chance, "chance", 15, "chance of answering to a message")
-	flag.IntVar(&cfg.imageChance, "image", 10, "chance of getting an image (1/chance) * (1/image)")
+	flag.IntVar(&cfg.memeChance, "meme", 10, "chance of getting a meme instead of text message")
 
 	flag.Parse()
 
@@ -43,9 +44,10 @@ func main() {
 	}
 
 	server := server{
-		chain:  markov.NewChain(cfg.prefixLen),
-		config: cfg,
-		bot:    bot,
+		chain:   markov.NewChain(cfg.prefixLen),
+		config:  cfg,
+		bot:     bot,
+		imgflip: *imgflip.New("moonlags_me", os.Getenv("IMGFLIP_PASSWORD")),
 	}
 
 	if err := server.run(); err != nil {
