@@ -54,11 +54,11 @@ func (s *server) run() error {
 			continue
 		}
 
-		text := s.chain.Generate(rand.Intn(8) + 3)
+		text := s.chain.Generate(rand.Intn(6) + 3)
 		slog.Info("response", "text", text)
 
 		if rand.Intn(101) < s.config.memeChance && len(s.memes) > 0 {
-			meme, err := s.imgflip.MemeWithCaption(s.memes[rand.Intn(len(s.memes))].ID, text, s.chain.Generate(rand.Intn(8)+3))
+			meme, err := s.imgflip.MemeWithCaption(s.memes[rand.Intn(len(s.memes))].ID, text, s.chain.Generate(rand.Intn(2)+3))
 			if err != nil {
 				slog.Error("Can not get meme with caption", "err", err)
 				continue
