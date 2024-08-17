@@ -61,6 +61,7 @@ func (s *server) run() error {
 			meme, err := s.imgflip.MemeWithCaption(s.memes[rand.Intn(len(s.memes))].ID, text, s.chain.Generate(rand.Intn(8)+3))
 			if err != nil {
 				slog.Error("Can not get meme with caption", "err", err)
+				continue
 			}
 
 			msg := tgbotapi.NewPhoto(update.FromChat().ID, tgbotapi.FileURL(meme))
