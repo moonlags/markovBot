@@ -44,7 +44,7 @@ func (s *server) run() error {
 			continue
 		}
 
-		text := s.chain.Generate(rand.Intn(6) + 3)
+		text := s.chain.Generate(rand.Intn(10) + 3)
 		slog.Info("response", "text", text)
 
 		msg := tgbotapi.NewMessage(update.FromChat().ID, text)
