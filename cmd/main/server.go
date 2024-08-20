@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"math/rand"
 	"os"
+	"strings"
 	"time"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
@@ -42,9 +43,30 @@ func (s *server) run() error {
 			continue
 		}
 
-		var imagePrompt string
-		if _, err := fmt.Sscanf(update.Message.Text, "/image %s", &imagePrompt); err == nil {
-			slog.Info("generating image", "prompt", imagePrompt)
+		var promptStart string
+		if _, err := fmt.Sscanf(update.Message.Text, "/image %s", &promptStart); err == nil {
+			promptIndex := strings.Index(update.Message.Text, promptStart)
+			prompt := update.Message.Text[promptIndex:]
+
+			slog.Info("generating image", "prompt", prompt)
+
+			url, err := s.runware.TextToImage(runware.TextToImageArgs{
+				Model:          "runware:100@1",
+				PositivePrompt: prompt,
+			})
+			if err != nil {
+				slog.Error("Can not generate image", "err", err)
+				continue
+			}
+
+			msg := tgbotapi.NewPhoto(update.FromChat().ID, tgbotapi.FileURL(url))
+			msg.Caption = s.chain.Generate(rand.Intn(10) + 3)
+
+			if _, err := s.bot.Send(msg); err != nil {
+				slog.Error("Can not send message", "err", err)
+				continue
+			}
+
 			continue
 		}
 
@@ -59,7 +81,8 @@ func (s *server) run() error {
 
 		msg := tgbotapi.NewMessage(update.FromChat().ID, text)
 		if _, err := s.bot.Send(msg); err != nil {
-			return err
+			slog.Error("Can not send message", "err", err)
+			continue
 		}
 	}
 	return nil

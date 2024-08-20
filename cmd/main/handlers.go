@@ -10,7 +10,7 @@ import (
 func (s *server) handleText(update tgbotapi.Update) {
 	slog.Info("message", "text", update.Message.Text, "firstname", update.Message.From.FirstName)
 
-	if !update.Message.Chat.IsGroup() {
+	if !update.Message.Chat.IsGroup() || strings.HasPrefix(update.Message.Text, "/") {
 		return
 	}
 
