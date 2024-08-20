@@ -27,7 +27,7 @@ func (s *server) run() error {
 
 	saveTicker := time.Tick(time.Minute * 5)
 
-	updates := s.bot.GetUpdatesChan(tgbotapi.NewUpdate(0))
+	updates := s.bot.GetUpdatesChan(tgbotapi.NewUpdate(-1))
 	for update := range updates {
 		if len(saveTicker) > 0 {
 			<-saveTicker
