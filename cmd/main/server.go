@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log/slog"
 	"math/rand"
 	"os"
@@ -9,12 +10,14 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 
 	"github.com/moonlags/markovBot/internal/markov"
+	"github.com/moonlags/runware-go"
 )
 
 type server struct {
-	chain  *markov.Chain
-	bot    *tgbotapi.BotAPI
-	config config
+	chain   *markov.Chain
+	bot     *tgbotapi.BotAPI
+	runware *runware.Client
+	config  config
 }
 
 func (s *server) run() error {
@@ -38,6 +41,13 @@ func (s *server) run() error {
 		if update.Message == nil {
 			continue
 		}
+
+		var imagePrompt string
+		if _, err := fmt.Sscanf(update.Message.Text, "/image %s", imagePrompt); err == nil {
+			slog.Info("generating image", "prompt", imagePrompt)
+			continue
+		}
+
 		s.handleText(update)
 
 		if rand.Intn(101) > s.config.chance {

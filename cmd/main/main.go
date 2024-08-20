@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"log/slog"
 	"os"
@@ -10,6 +11,7 @@ import (
 	"github.com/lmittmann/tint"
 
 	"github.com/moonlags/markovBot/internal/markov"
+	"github.com/moonlags/runware-go"
 )
 
 type config struct {
@@ -40,10 +42,17 @@ func main() {
 		os.Exit(1)
 	}
 
+	client, err := runware.New(context.Background(), os.Getenv("RUNWARE_KEY"))
+	if err != nil {
+		slog.Error("Can not create runware client", "err", err)
+		os.Exit(1)
+	}
+
 	server := server{
-		chain:  markov.NewChain(cfg.prefixLen),
-		config: cfg,
-		bot:    bot,
+		chain:   markov.NewChain(cfg.prefixLen),
+		config:  cfg,
+		bot:     bot,
+		runware: client,
 	}
 
 	if err := server.run(); err != nil {
