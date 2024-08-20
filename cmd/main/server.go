@@ -43,8 +43,8 @@ func (s *server) run() error {
 		}
 
 		var imagePrompt string
-		if _, err := fmt.Sscanf(update.Message.Text, "/image %s", imagePrompt); err == nil {
-			slog.Info("generating image", "prompt", imagePrompt)
+		if _, err := fmt.Sscanf(update.Message.Text, "/image %s", imagePrompt); err != nil {
+			slog.Info("generating image", "prompt", imagePrompt, "err", err)
 			continue
 		}
 
