@@ -45,7 +45,7 @@ func (s *server) run() error {
 
 		var promptStart string
 		if _, err := fmt.Sscanf(update.Message.Text, "/image %s", &promptStart); err == nil {
-			promptIndex := strings.Index(update.Message.Text, promptStart)
+			promptIndex := strings.Index(update.Message.Text[6:], promptStart)
 			prompt := update.Message.Text[promptIndex:]
 
 			slog.Info("generating image", "prompt", prompt)
