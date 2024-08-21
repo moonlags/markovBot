@@ -1,4 +1,3 @@
 .env
 bin
-go.sum
 data.gob

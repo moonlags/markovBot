@@ -53,6 +53,8 @@ func (s *server) run() error {
 			url, err := s.runware.TextToImage(runware.TextToImageArgs{
 				Model:          "runware:100@1",
 				PositivePrompt: prompt,
+				Width:          1024,
+				Height:         1024,
 			})
 			if err != nil {
 				slog.Error("Can not generate image", "err", err)
