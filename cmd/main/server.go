@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log/slog"
 	"math/rand"
 	"os"
@@ -43,14 +42,9 @@ func (s *server) run() error {
 			continue
 		}
 
-		var promptStart string
-		if _, err := fmt.Sscanf(update.Message.Text, "/image %s", &promptStart); err == nil {
-			promptIndex := strings.Index(update.Message.Text[6:], promptStart)
-			prompt := update.Message.Text[promptIndex:]
-
-			slog.Info("generating image", "prompt", prompt)
-
-			url, err := s.runware.TextToImage(runware.TextToImageArgs{
+		if strings.HasPrefix(update.Message.Text, "/image ") {
+			prompt := update.Message.Text[7:]
+			images, err := s.runware.TextToImage(runware.TextToImageArgs{
 				Model:          "runware:100@1",
 				PositivePrompt: prompt,
 				Width:          1024,
@@ -61,9 +55,9 @@ func (s *server) run() error {
 				continue
 			}
 
-			msg := tgbotapi.NewPhoto(update.FromChat().ID, tgbotapi.FileURL(url[0].URL))
-			msg.Caption = s.chain.Generate(rand.Intn(10) + 3)
+			slog.Info("generated images", "prompt", prompt, "images", images)
 
+			msg := tgbotapi.NewPhoto(update.FromChat().ID, tgbotapi.FileURL(images[0].URL))
 			if _, err := s.bot.Send(msg); err != nil {
 				slog.Error("Can not send message", "err", err)
 				continue

@@ -10,3 +10,5 @@ github.com/lmittmann/tint v1.0.5 h1:NQclAutOfYsqs2F1Lenue6OoWCajs5wJcP3DfWVpePw=
 github.com/lmittmann/tint v1.0.5/go.mod h1:HIS3gSy7qNwGCj+5oRjAutErFBl4BzdQP6cJZ0NfMwE=
 github.com/moonlags/runware-go v0.0.0-20240831101643-85c3a0bdea30 h1:Osp86EhyWfOLcIEYtKrnwm7KO23k4M+6oaN3pqdSKgA=
 github.com/moonlags/runware-go v0.0.0-20240831101643-85c3a0bdea30/go.mod h1:qYiItZrlg9wyAcbbhYjfntJ4fC3rDTP+Nb/rWR7cSOA=
+github.com/moonlags/runware-go v0.0.0-20240831182027-688d11c18f61 h1:CQZj97gUbjTfhdZ4kwoYSv4K/5m3A85Cs2hzAMIwseM=
+github.com/moonlags/runware-go v0.0.0-20240831182027-688d11c18f61/go.mod h1:qYiItZrlg9wyAcbbhYjfntJ4fC3rDTP+Nb/rWR7cSOA=
