@@ -61,7 +61,7 @@ func (s *server) run() error {
 				continue
 			}
 
-			msg := tgbotapi.NewPhoto(update.FromChat().ID, tgbotapi.FileURL(url))
+			msg := tgbotapi.NewPhoto(update.FromChat().ID, tgbotapi.FileURL(url[0].URL))
 			msg.Caption = s.chain.Generate(rand.Intn(10) + 3)
 
 			if _, err := s.bot.Send(msg); err != nil {

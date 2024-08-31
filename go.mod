@@ -6,7 +6,7 @@ require (
 	github.com/go-telegram-bot-api/telegram-bot-api/v5 v5.5.1
 	github.com/joho/godotenv v1.5.1
 	github.com/lmittmann/tint v1.0.5
-	github.com/moonlags/runware-go v0.0.0-20240820151957-01849f19e082
+	github.com/moonlags/runware-go v0.0.0-20240831101643-85c3a0bdea30
 )
 
 require (
